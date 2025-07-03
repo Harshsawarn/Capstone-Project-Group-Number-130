@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IIT Patna - Guard Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  
+  <link rel="stylesheet" href="css/guard-style.css" />
+</head>
+<body>
+  <div class="guard-container">
+    <h1>IIT Patna</h1>
+    <h2>Guard Panel</h2>
+    <p class="instruction">Select action and scan student QR code</p>
+
+    <div class="btn-group">
+      <button class="btn" onclick="startScanner('entry')">Mark Entry</button>
+      <button class="btn" onclick="startScanner('exit')">Mark Exit</button>
+    </div>
+
+    <div id="reader" class="qr-reader"></div>
+    <div id="result" class="result-message"></div>
+  </div>
+
+  <footer>
+    Capstone Project • Built by Group No. 130
+  </footer>
+
+  <script>
+    const db = firebase.firestore();
+    let html5QrCode;
+    let currentType = '';
+    let cameraId = null;
+
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices.length) cameraId = devices[0].id;
+      else document.getElementById("result").innerHTML = `<span class="error">❌ No camera found!</span>`;
+    });
+
+    async function startScanner(type) {
+      currentType = type;
+      document.getElementById("result").innerText = "";
+      document.getElementById("reader").style.display = "block";
+
+      if (html5QrCode && html5QrCode._isScanning) {
+        await html5QrCode.stop();
+        document.getElementById("reader").innerHTML = "";
+      }
+
+      html5QrCode = new Html5Qrcode("reader");
+
+      html5QrCode.start(
+        cameraId,
+        { fps: 10, qrbox: 250 },
+        async qrData => {
+          try {
+            await html5QrCode.stop();
+            document.getElementById("reader").innerHTML = "";
+            const record = {
+              studentId: qrData.trim(),
+              type: currentType,
+              timestamp: new Date().toISOString()
+            };
+            await db.collection("attendance").add(record);
+            document.getElementById("result").innerText =
+              `✅ ${currentType.toUpperCase()} marked for ID: ${qrData}`;
+            setTimeout(() => startScanner(currentType), 1500);
+          } catch (err) {
+            console.error(err);
+            document.getElementById("result").innerHTML = `<span class="error">❌ Error: ${err.message}</span>`;
+          }
+        },
+        error => {
+          
+        }
+      );
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+

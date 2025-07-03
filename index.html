@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>Attendance PWA</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <h1>Login / Register</h1>
+  <select id="role">
+    <option value="guard">Guard</option>
+    <option value="admin">Admin</option>
+  </select>
+  <input type="email" id="email" placeholder="Email"/>
+  <input type="password" id="password" placeholder="Password"/>
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
